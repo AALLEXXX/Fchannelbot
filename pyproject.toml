@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "furysbot"
+version = "0.1.0"
+description = "bot for privat furys caht"
+authors = ["Alex <alxjy@ya.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+aiogram = "^3.7.0"
+environs = "^11.0.0"
+alembic = "^1.13.1"
+aiosqlite = "^0.20.0"
+greenlet = "^3.0.3"
+redis = "^5.0.5"
+apscheduler-di = "^0.1.0"
+asyncpg = "^0.29.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

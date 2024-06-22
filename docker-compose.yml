@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  db:
+    container_name: pg_db
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: db.dockerfile
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: furys_db
+    ports:
+      - "5435:5432"
+
+  redis:
+    image: redis:alpine
+    restart: on-failure
+
+    ports:
+      - "6379:6379"
+
+  backend:
+    container_name: backend
+    build:
+      context: .
+      dockerfile: backend.dockerfile
+    restart: always
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    command: sh -c "alembic upgrade head && python3 main.py"
+    environment:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@pg_db:5432/furys_db
+    env_file:
+      - .env
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./:/backend
+
+volumes:
+  ./:
+
