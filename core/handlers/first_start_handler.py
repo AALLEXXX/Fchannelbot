@@ -30,7 +30,7 @@ async def first_user_start_handler(msg: Message, bot: Bot):
 
     try:
         if await UsersSubsDAO.check_user_access(tg_username):
-            link = await bot.create_chat_invite_link(settings.test_channel_id, member_limit=1, expire_date=timedelta(hours=3))
+            link = await bot.create_chat_invite_link(settings.channel_id, member_limit=1, expire_date=timedelta(hours=3))
             await UsersSubsDAO.update_link_by_username(tg_username, link.invite_link)
             answer_msg += f"Thanks for the purchase, your link -\n{link.invite_link}"
     except Exception as e:

@@ -39,9 +39,4 @@ services:
       - .env
     ports:
       - "8001:8000"
-    volumes:
-      - ./:/backend
-
-volumes:
-  ./:
 

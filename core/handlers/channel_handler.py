@@ -40,7 +40,7 @@ async def on_user_join(event: ChatMemberUpdated, apscheduler: AsyncIOScheduler, 
         await bot.send_message(chat_id=settings.ADMIN_ID,
                                text=msg_text)
 
-        return await bot.unban_chat_member(chat_id=settings.test_channel_id, user_id=chat_id)
+        return await bot.unban_chat_member(chat_id=settings.channel_id, user_id=chat_id)
 
     date_to = await UsersSubsDAO.get_sub_dateto_by_chat_id(chat_id=chat_id)
 
