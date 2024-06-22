@@ -39,4 +39,3 @@ services:
       - .env
     ports:
       - "8001:8000"
-
