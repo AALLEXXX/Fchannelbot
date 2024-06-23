@@ -43,11 +43,12 @@ async def on_user_join(event: ChatMemberUpdated, apscheduler: AsyncIOScheduler, 
         return await bot.unban_chat_member(chat_id=settings.channel_id, user_id=chat_id)
 
     date_to = await UsersSubsDAO.get_sub_dateto_by_chat_id(chat_id=chat_id)
-
+    print(date_to)
+    print(date_to.date_to)
     # apscheduler.add_job(kick_user, trigger='date',
     #                     run_date=dt.datetime.now() + dt.timedelta(minutes=15), misfire_grace_time=None,
     #                     kwargs={"chat_id": settings.test_channel_id, "user_id": event.from_user.id})
 
     apscheduler.add_job(kick_user, trigger='date',
-                        run_date=date_to, misfire_grace_time=None,
+                        run_date=date_to.date_to, misfire_grace_time=None,
                         kwargs={"chat_id": settings.channel_id, "user_id": chat_id})
