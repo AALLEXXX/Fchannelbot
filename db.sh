@@ -14,6 +14,7 @@ sleep 5
 # Create the database
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" <<EOF
 CREATE DATABASE furys_db;
+
 EOF
 
 # Configure pg_hba.conf to allow connections from any IP address
