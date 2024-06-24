@@ -1,11 +1,11 @@
 from core.database.db import Base
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, ForeignKey
+from sqlalchemy import DateTime, ForeignKey, BigInteger
 
 
 class User(Base):
     __tablename__ = "users"
-    chat_id: Mapped[int] = mapped_column(primary_key=True)
+    chat_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[str] = mapped_column(nullable=True)
     role: Mapped[str] = mapped_column(nullable=True)
     reg_date: Mapped[DateTime] = mapped_column(DateTime, nullable=True)
