@@ -200,7 +200,7 @@ celerybeat.pid
 *.sage.py
 
 # Environments
-
+redis_data/
 .venv
 env/
 venv/
