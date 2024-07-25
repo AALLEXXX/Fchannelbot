@@ -38,7 +38,7 @@ async def manual_remove(msg: Message, apscheduler: AsyncIOScheduler, bot: Bot):
             chat_id = dict["chat_id"]
             date_to = dict["date_to"]
             username = dict["tg_username"]
-            if date_to > datetime.datetime.now().date():
+            if date_to > datetime.datetime.now():
                 apscheduler.add_job(kick_user, trigger='date',
                                     id=f"kick_user_{chat_id}",
                                     run_date=date_to, misfire_grace_time=None,
@@ -57,6 +57,9 @@ async def manual_remove(msg: Message, apscheduler: AsyncIOScheduler, bot: Bot):
         except Exception as e:
             await bot.send_message(chat_id=settings.ADMIN_ID,
                                    text=f'ошибка в цикле \n {e}')
+
+
+
 @admin_router.message(StepsAdd.WAITING_USERNAME, IsAdmin())
 async def process_username(msg: Message, state: FSMContext, bot: Bot):
     username = msg.text.strip()
