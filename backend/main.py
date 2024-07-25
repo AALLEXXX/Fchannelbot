@@ -31,7 +31,7 @@ async def start() -> None:
         f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/0"
     )
     dp = Dispatcher(storage=storage)
-    # dp.shutdown.register(stop)
+    dp.shutdown.register(stop)
 
 
     dp.message.middleware.register((ThrottlingMiddleware(storage=storage)))
@@ -50,7 +50,7 @@ async def start() -> None:
         'max_instances': 3
     }
 
-    # await set_commands(bot)
+    await set_commands(bot)
 
     scheduler = ContextSchedulerDecorator(
         AsyncIOScheduler(timezone="Europe/Moscow", jobstores=jobstores)
@@ -65,7 +65,7 @@ async def start() -> None:
     dp.include_router(channel_router)
 
     try:
-        #await schedule_backup_db_file(scheduler, bot)
+        await schedule_backup_db_file(scheduler, bot)
         await dp.start_polling(bot)
     except Exception as e:
         logging.error(f"[!!! Exceprion - {e}]", exc_info=True)
