@@ -33,7 +33,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_started
-    command: sh -c "alembic upgrade head && python3 main.py"
+    command: sh -c "python3 main.py"
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@pg_db:5432/furys_db
     env_file:

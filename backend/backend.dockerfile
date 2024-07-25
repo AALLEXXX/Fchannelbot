@@ -25,8 +25,8 @@ ENV REDIS_HOST=redis
 ENV REDIS_PORT=6379
 
 ##RUN sleep 15 && alembic upgrade head
-#CMD ["alembic", "revision", "--autogenerate"]
+#RUN alembic revision --autogenerate
 #
-#CMD ["alembic", "upgrade", "head"]
+#RUN alembic upgrade head
 ## Запуск приложения
 #CMD ["python3", "main.py"]
