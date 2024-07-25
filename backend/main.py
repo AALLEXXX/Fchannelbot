@@ -50,7 +50,7 @@ async def start() -> None:
         'max_instances': 3
     }
 
-    await set_commands(bot)
+    # await set_commands(bot)
 
     scheduler = ContextSchedulerDecorator(
         AsyncIOScheduler(timezone="Europe/Moscow", jobstores=jobstores)
