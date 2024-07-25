@@ -17,15 +17,16 @@ services:
   redis:
     image: redis:alpine
     restart: on-failure
-
     ports:
       - "6379:6379"
+    volumes:
+      - ./redis_data:/data
 
   backend:
     container_name: backend
     build:
       context: .
-      dockerfile: backend.dockerfile
+      dockerfile: backend/backend.dockerfile
     restart: always
     depends_on:
       db:
@@ -34,8 +35,11 @@ services:
         condition: service_started
     command: sh -c "alembic upgrade head && python3 main.py"
     environment:
-      DATABASE_URL: postgresql+psycopg://postgres:postgres@pg_db:5432/furys_db
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@pg_db:5432/furys_db
     env_file:
-      - .env
+      - backend/.env
     ports:
       - "8001:8000"
+    volumes:
+      - ./backend:/backend
+
