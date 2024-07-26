@@ -73,10 +73,11 @@ class UsersSubsDAO(BaseDAO):
     @classmethod
     async def get_sub_dateto_by_chat_id(cls, chat_id: int):
         async with (async_session_maker() as session):
+            now = datetime.now()
             qr = (select(UsersSub.date_to)
                   .select_from(User)
                   .join(UsersSub, User.tg_username == UsersSub.tg_username)
-                  .where(User.chat_id == chat_id)
+                  .where(and_(User.chat_id == chat_id, UsersSub.date_to <= now, UsersSub.date_to >= now))
                   )
             result = await session.execute(qr)
             return result.mappings().one_or_none()
