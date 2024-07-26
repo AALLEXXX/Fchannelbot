@@ -25,7 +25,7 @@ async def on_user_join(event: ChatMemberUpdated, apscheduler: AsyncIOScheduler, 
     chat_id = event.from_user.id
 
     if not(await UsersSubsDAO.check_user_access_on_join(chat_id=chat_id)):
-        print(event.invite_link.invite_link)
+
 
 
         msg_text = f"Кто то пытался зайти в канал по чужой ссылке не имея доступа.\n" \
@@ -44,7 +44,6 @@ async def on_user_join(event: ChatMemberUpdated, apscheduler: AsyncIOScheduler, 
 
     date_to = await UsersSubsDAO.get_sub_dateto_by_chat_id(chat_id=chat_id)
 
-    print(date_to.date_to)
     # apscheduler.add_job(kick_user, trigger='date',
     #                     run_date=dt.datetime.now() + dt.timedelta(minutes=15), misfire_grace_time=None,
     #                     kwargs={"chat_id": settings.test_channel_id, "user_id": event.from_user.id})
