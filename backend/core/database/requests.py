@@ -46,7 +46,6 @@ class UserDAO(BaseDAO):
 
 
 
-
 class UsersSubsDAO(BaseDAO):
     model = UsersSub
 
@@ -64,7 +63,9 @@ class UsersSubsDAO(BaseDAO):
     @classmethod
     async def update_link_by_username(cls, username: str, link: str) -> bool:
         async with async_session_maker() as session:
-            query = update(cls.model).where(cls.model.tg_username == username).values(link=link)
+            now = datetime.now()
+            query = update(cls.model).where(and_(cls.model.tg_username == username),
+                                            cls.model.date_from <= now, cls.model.date_to >= now).values(link=link)
             await session.execute(query)
             await session.commit()
             return True
