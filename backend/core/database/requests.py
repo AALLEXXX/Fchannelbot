@@ -53,12 +53,11 @@ class UsersSubsDAO(BaseDAO):
     @classmethod
     async def check_user_access(cls, username: str) -> bool:
         async with async_session_maker() as session:
-            query = select(cls.model.__table__.columns).filter(cls.model.tg_username == username)
+            now = datetime.now()
+            query = select(cls.model.__table__.columns).filter(and_(cls.model.tg_username == username, cls.model.date_from <= now, cls.model.date_to >= now))
             q_result: ResultProxy = await session.execute(query)
             user_sub = q_result.mappings().one_or_none()
-
-            now = datetime.now()
-            if user_sub and (user_sub.date_from <= now and user_sub.date_to >= now) and user_sub.link == None:
+            if user_sub and user_sub.link == None:
                 return True
             return False
 
