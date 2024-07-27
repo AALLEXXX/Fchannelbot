@@ -29,10 +29,19 @@ async def add(msg: Message, state: FSMContext):
     await msg.answer("Отправь мне username пользователя")
 
 
+@admin_router.message(Command("get_jobs"), IsAdmin())
+async def get_jobs(msg: Message, apscheduler: AsyncIOScheduler, bot: Bot):
+    jobs = apscheduler.get_jobs("default")
+    for job in jobs:
+        await bot.send_message(msg.chat.id, f"{job.id}\n{job.name}\n{job.trigger}\n{job.next_run_time}\n{job.args}")
+
+
+
 @admin_router.message(Command("manual_remove"), IsAdmin())
 async def manual_remove(msg: Message, apscheduler: AsyncIOScheduler, bot: Bot):
     data = await UsersSubsDAO.get_latest_subscriptions()
-    await bot.send_message(settings.ADMIN_ID, text=f"логи мануал удаления")
+    answer_chat_id = msg.chat.id
+    await bot.send_message(answer_chat_id, text=f"логи мануал удаления")
     for dict in data:
         try:
             chat_id = dict["chat_id"]
@@ -49,20 +58,20 @@ async def manual_remove(msg: Message, apscheduler: AsyncIOScheduler, bot: Bot):
 
                 job = apscheduler.get_job(job_id)
                 if job:
-                    await bot.send_message(settings.ADMIN_ID, text=f"юзер {username} {chat_id} будет исключен {date_to}")
+                    await bot.send_message(answer_chat_id, text=f"юзер {username} {chat_id} будет исключен {date_to}")
                 else:
-                    await bot.send_message(settings.ADMIN_ID, text=f"Задачи нет\n {job} \n юзер {username} {chat_id} не удалось создать задачу")
+                    await bot.send_message(answer_chat_id, text=f"Задачи нет\n {job} \n юзер {username} {chat_id} не удалось создать задачу")
             else:
                 if await bot.unban_chat_member(chat_id=settings.channel_id, user_id=chat_id):
                     await bot.send_message(chat_id=chat_id,
                                            text="Your size time per month in the telegram channel has expired, you need to resume access to it by re-purchasing")
-                    await bot.send_message(settings.ADMIN_ID,
+                    await bot.send_message(answer_chat_id,
                                            text=f"юзер {username} {chat_id} исключен")
                 else:
-                    await bot.send_message(chat_id=settings.ADMIN_ID,
+                    await bot.send_message(chat_id=answer_chat_id,
                                            text=f'Не удалось кикнуть пользователя user_chat_id {chat_id}.')
         except Exception as e:
-            await bot.send_message(chat_id=settings.ADMIN_ID,
+            await bot.send_message(chat_id=answer_chat_id,
                                    text=f'ошибка в цикле \n {e}')
 
 
