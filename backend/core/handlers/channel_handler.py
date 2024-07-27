@@ -8,10 +8,11 @@ from core.database.requests import UsersSubsDAO
 
 channel_router = Router()
 
-async def kick_user(bot: Bot, chat_id: int, user_id: int):
+async def kick_user(bot: Bot, chat_id: int, user_id: int, username: str):
     try:
         if await bot.unban_chat_member(chat_id=chat_id, user_id=user_id):
             await bot.send_message(chat_id=user_id, text="Your size time per month in the telegram channel has expired, you need to resume access to it by re-purchasing")
+            await bot.send_message(chat_id=settings.ADMIN_ID, text=f"кикнут юзер {username} {chat_id}")
         else:
             await bot.send_message(chat_id=settings.ADMIN_ID,
                                    text=f'Не удалось кикнуть пользователя user_chat_id {user_id}.')
@@ -52,6 +53,6 @@ async def on_user_join(event: ChatMemberUpdated, apscheduler: AsyncIOScheduler, 
                         id=f"kick_user_{chat_id}",
                         run_date=date_to.date_to, misfire_grace_time=None,
                         replace_existing=True,
-                        kwargs={"chat_id": settings.channel_id, "user_id": chat_id})
+                        kwargs={"chat_id": settings.channel_id, "user_id": chat_id, "username" : event.from_user.username})
     await bot.send_message(chat_id=settings.ADMIN_ID,
                            text=f"Пользователь  {event.from_user.username} {chat_id} будет кикнут {date_to.date_to}" )
