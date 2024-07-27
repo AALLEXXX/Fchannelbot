@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from sqlalchemy import select, ResultProxy, RowMapping, update, and_, join, func
+from sqlalchemy import select, ResultProxy, RowMapping, update, and_, join
 
 from core.database.basedao import BaseDAO
 from core.database.db import async_session_maker
@@ -141,14 +141,14 @@ class UsersSubsDAO(BaseDAO):
             """
             # Подзапрос для получения максимальной даты окончания подписки
             subquery = (
-                select(UsersSub.tg_username, func.max(UsersSub.date_to))
+                select(UsersSub.tg_username, func.max(UsersSub.date_to).label('max_date_to'))
                 .group_by(UsersSub.tg_username)
                 .subquery()
             )
 
             # Основной запрос
             query = (
-                select(User.chat_id, User.tg_username, subquery.c.date_to)
+                select(User.chat_id, User.tg_username, subquery.c.max_date_to)
                 .join(subquery, User.tg_username == subquery.c.tg_username)
             )
 
