@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from sqlalchemy import select, ResultProxy, RowMapping, update, and_, join
+from sqlalchemy import select, ResultProxy, RowMapping, update, and_, join, func
 
 from core.database.basedao import BaseDAO
 from core.database.db import async_session_maker
@@ -110,15 +110,49 @@ class UsersSubsDAO(BaseDAO):
 
 
     @classmethod
-    async def get_dates_from_all_users_for_kick(cls) -> List[dict]:
-        async with (async_session_maker() as session):
+    async def get_dates_from_all_users_for_kick_v1(cls) -> List[dict]:
+        async with async_session_maker() as session:
             """"
             select date_to, users_subs.tg_username, chat_id 
             from users_subs 
             inner join users on users_subs.tg_username = users.tg_username
             """
             query = (select(UsersSub.date_to, UsersSub.tg_username, User.chat_id).select_from(UsersSub)
-                     .join(User, User.tg_username == UsersSub.tg_username))
+                     .join(User, User.tg_username == UsersSub.tg_username)
+                     )
+            q_result = (await session.execute(query)).mappings().all()
+            print(q_result)
+            return q_result
+
+    @classmethod
+    async def get_latest_subscriptions(cls) -> List[dict]:
+
+        async with async_session_maker() as session:
+            """"
+            select users.chat_id, users.tg_username, max_date_to
+            from users 
+            join (
+            SELECT tg_username, MAX(date_to) AS max_date_to
+            FROM users_subs
+            GROUP BY tg_username
+            ) users_subs
+            
+            ON users.tg_username = users_subs.tg_username 
+            """
+            # Подзапрос для получения максимальной даты окончания подписки
+            subquery = (
+                select(UsersSub.tg_username, func.max(UsersSub.date_to))
+                .group_by(UsersSub.tg_username)
+                .subquery()
+            )
+
+            # Основной запрос
+            query = (
+                select(User.chat_id, User.tg_username, subquery.c.date_to)
+                .join(subquery, User.tg_username == subquery.c.tg_username)
+            )
+
+            # Выполнение запроса и получение результатов
             q_result = (await session.execute(query)).mappings().all()
             print(q_result)
             return q_result
