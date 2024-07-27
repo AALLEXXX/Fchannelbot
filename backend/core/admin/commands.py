@@ -33,30 +33,37 @@ async def add(msg: Message, state: FSMContext):
 async def manual_remove(msg: Message, apscheduler: AsyncIOScheduler, bot: Bot):
     data = await UsersSubsDAO.get_latest_subscriptions()
     await bot.send_message(settings.ADMIN_ID, text=f"логи мануал удаления")
-    # for dict in data:
-    #     try:
-    #         chat_id = dict["chat_id"]
-    #         date_to = dict["date_to"]
-    #         username = dict["tg_username"]
-    #         if date_to > datetime.datetime.now():
-    #             apscheduler.add_job(kick_user, trigger='date',
-    #                                 id=f"kick_user_{chat_id}",
-    #                                 run_date=date_to, misfire_grace_time=None,
-    #                                 replace_existing=True,
-    #                                 kwargs={"chat_id": settings.channel_id, "user_id": chat_id})
-    #             await bot.send_message(settings.ADMIN_ID, text=f"юзер {username} {chat_id} будет исключен {date_to}")
-    #         else:
-    #             if await bot.unban_chat_member(chat_id=settings.channel_id, user_id=chat_id):
-    #                 await bot.send_message(chat_id=chat_id,
-    #                                        text="Your size time per month in the telegram channel has expired, you need to resume access to it by re-purchasing")
-    #                 await bot.send_message(settings.ADMIN_ID,
-    #                                        text=f"юзер {username} {chat_id} исключен")
-    #             else:
-    #                 await bot.send_message(chat_id=settings.ADMIN_ID,
-    #                                        text=f'Не удалось кикнуть пользователя user_chat_id {chat_id}.')
-    #     except Exception as e:
-    #         await bot.send_message(chat_id=settings.ADMIN_ID,
-    #                                text=f'ошибка в цикле \n {e}')
+    for dict in data:
+        try:
+            chat_id = dict["chat_id"]
+            date_to = dict["max_date_to"]
+            username = dict["tg_username"]
+            if date_to > datetime.datetime.now():
+                job_id = f"kick_user_{chat_id}"
+
+                apscheduler.add_job(kick_user, trigger='date',
+                                    id=job_id,
+                                    run_date=date_to, misfire_grace_time=None,
+                                    replace_existing=True,
+                                    kwargs={"chat_id": settings.channel_id, "user_id": chat_id})
+
+                job = apscheduler.get_job(job_id)
+                if job:
+                    await bot.send_message(settings.ADMIN_ID, text=f"юзер {username} {chat_id} будет исключен {date_to}")
+                else:
+                    await bot.send_message(settings.ADMIN_ID, text=f"Задачи нет\n {job} \n юзер {username} {chat_id} не удалось создать задачу")
+            else:
+                if await bot.unban_chat_member(chat_id=settings.channel_id, user_id=chat_id):
+                    await bot.send_message(chat_id=chat_id,
+                                           text="Your size time per month in the telegram channel has expired, you need to resume access to it by re-purchasing")
+                    await bot.send_message(settings.ADMIN_ID,
+                                           text=f"юзер {username} {chat_id} исключен")
+                else:
+                    await bot.send_message(chat_id=settings.ADMIN_ID,
+                                           text=f'Не удалось кикнуть пользователя user_chat_id {chat_id}.')
+        except Exception as e:
+            await bot.send_message(chat_id=settings.ADMIN_ID,
+                                   text=f'ошибка в цикле \n {e}')
 
 
 
