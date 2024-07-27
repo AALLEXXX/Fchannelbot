@@ -1,6 +1,6 @@
 from typing import Any, List
 
-from sqlalchemy import select, ResultProxy, RowMapping, update, and_, join
+from sqlalchemy import select, ResultProxy, RowMapping, update, and_, join, func
 
 from core.database.basedao import BaseDAO
 from core.database.db import async_session_maker
