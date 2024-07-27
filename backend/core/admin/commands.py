@@ -35,6 +35,10 @@ async def get_jobs(msg: Message, apscheduler: AsyncIOScheduler, bot: Bot):
     for job in jobs:
         await bot.send_message(msg.chat.id, f"{job.id}\n{job.name}\n{job.trigger}\n{job.next_run_time}\n{job.args}")
 
+@admin_router.message(Command("clean_all_jobs"), IsAdmin())
+async def clean_all_jobs(msg: Message, apscheduler: AsyncIOScheduler, bot: Bot):
+    apscheduler.remove_all_jobs("default")
+    await bot.send_message(msg.chat.id, text="jobs cleared")
 
 
 @admin_router.message(Command("manual_remove"), IsAdmin())
